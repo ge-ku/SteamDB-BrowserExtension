@@ -1,3 +1,5 @@
+/* global StartViewTransition */
+
 'use strict';
 
 const tierColors = [
@@ -351,31 +353,6 @@ const CreateCSRatingTable = ( container, rows ) =>
 };
 
 /**
- * @param {ViewTransitionUpdateCallback} callback
- */
-const StartViewTransition = ( callback ) =>
-{
-	if( document.startViewTransition )
-	{
-		document.startViewTransition( () =>
-		{
-			try
-			{
-				callback();
-			}
-			catch( e )
-			{
-				console.error( '[SteamDB]', e );
-			}
-		} );
-	}
-	else
-	{
-		callback();
-	}
-};
-
-/**
  * @param {string} profileUrl
  */
 const FetchCSRating = async( profileUrl ) =>
@@ -430,16 +407,9 @@ const FetchCSRating = async( profileUrl ) =>
 
 	CreateCSRatingTable( summary, premierRows );
 
-	const achievementsList = document.querySelector( '#CommunityTemplate .Panel:has([data-index])' );
-
-	if( !achievementsList )
-	{
-		return;
-	}
-
 	StartViewTransition( () =>
 	{
-		achievementsList.after( summary );
+		document.querySelector( '#CommunityTemplate .Panel:has([data-index])' ).after( summary );
 
 		if( chart !== null )
 		{
