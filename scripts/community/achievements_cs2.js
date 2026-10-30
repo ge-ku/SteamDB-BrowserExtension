@@ -1,5 +1,3 @@
-/* global StartViewTransition */
-
 'use strict';
 
 const tierColors = [
@@ -353,6 +351,31 @@ const CreateCSRatingTable = ( container, rows ) =>
 };
 
 /**
+ * @param {ViewTransitionUpdateCallback} callback
+ */
+const StartViewTransition = ( callback ) =>
+{
+	if( document.startViewTransition )
+	{
+		document.startViewTransition( () =>
+		{
+			try
+			{
+				callback();
+			}
+			catch( e )
+			{
+				console.error( '[SteamDB]', e );
+			}
+		} );
+	}
+	else
+	{
+		callback();
+	}
+};
+
+/**
  * @param {string} profileUrl
  */
 const FetchCSRating = async( profileUrl ) =>
@@ -407,9 +430,16 @@ const FetchCSRating = async( profileUrl ) =>
 
 	CreateCSRatingTable( summary, premierRows );
 
+	const achievementsList = document.querySelector( '#CommunityTemplate .Panel:has([data-index])' );
+
+	if( !achievementsList )
+	{
+		return;
+	}
+
 	StartViewTransition( () =>
 	{
-		document.querySelector( '#mainContents' ).append( summary );
+		achievementsList.after( summary );
 
 		if( chart !== null )
 		{
@@ -418,15 +448,18 @@ const FetchCSRating = async( profileUrl ) =>
 	} );
 };
 
-/**
- * @param {string} str
- */
-const removeTrailingSlash = ( str ) => str.endsWith( '/' ) ? str.slice( 0, -1 ) : str;
+const profilePathRegex = /^\/(?:id|profiles)\/[^/]+/;
 
-const viewingProfile = removeTrailingSlash( /** @type {HTMLAnchorElement} */ ( document.querySelector( '.pagecontent .persona_name_text_content' ) )?.pathname ?? '' );
-const myProfile = removeTrailingSlash( /** @type {HTMLAnchorElement} */ ( document.querySelector( '#global_actions .user_avatar' ) )?.pathname ?? '' );
+/** @type {HTMLAnchorElement} */
+const viewingProfileLink = document.querySelector( '#CommunityTemplate a[href$="/achievements/730"]' );
+const viewingProfile = viewingProfileLink?.pathname.match( profilePathRegex )?.[ 0 ];
 
-if( viewingProfile === myProfile )
+// Link to my account is in header dropdown menu
+/** @type {HTMLAnchorElement} */
+const myProfileLink = document.querySelector( '#CommunityTemplate header [popover] a[href*="/id/"], #CommunityTemplate header [popover] a[href*="/profiles/"]' );
+const myProfile = myProfileLink?.pathname.match( profilePathRegex )?.[ 0 ];
+
+if( myProfile && viewingProfile === myProfile )
 {
 	FetchCSRating( myProfile );
 }
