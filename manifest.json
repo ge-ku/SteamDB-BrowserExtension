@@ -399,12 +399,8 @@
 			"run_at": "document_end",
 			"matches":
 			[
-				"https://steamcommunity.com/id/*/achievements/730",
-				"https://steamcommunity.com/id/*/achievements/730/*",
-				"https://steamcommunity.com/id/*/achievements/730?*",
-				"https://steamcommunity.com/profiles/*/achievements/730",
-				"https://steamcommunity.com/profiles/*/achievements/730/*",
-				"https://steamcommunity.com/profiles/*/achievements/730?*"
+				"https://steamcommunity.com/id/*/achievements/730*",
+				"https://steamcommunity.com/profiles/*/achievements/730*"
 			],
 			"js":
 			[
